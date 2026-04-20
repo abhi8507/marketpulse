@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+
+  # ─── Zookeeper (required by Kafka) ───────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: marketpulse-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - marketpulse-network
+
+  # ─── Kafka Broker ─────────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: marketpulse-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketpulse-network
+
+  # ─── Kafka UI ─────────────────────────────────────────────────
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: marketpulse-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: marketpulse
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - marketpulse-network
+
+  # ─── PostgreSQL ────────────────────────────────────────────────
+  postgres:
+    image: postgres:15
+    container_name: marketpulse-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: marketpulse
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d marketpulse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketpulse-network
+
+  # ─── Prometheus ────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: marketpulse-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - marketpulse-network
+
+  # ─── Grafana ───────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: marketpulse-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    networks:
+      - marketpulse-network
+
+volumes:
+  postgres_data:
+
+networks:
+  marketpulse-network:
+    driver: bridge
