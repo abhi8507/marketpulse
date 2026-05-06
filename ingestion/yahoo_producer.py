@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 TOPIC           = "raw-ticks"
 SYMBOLS         = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
-INTERVAL_SEC    = 60   # fetch every 60 seconds
+INTERVAL_SEC    = 10   # fetch every 10 seconds
 
 
 def create_producer():

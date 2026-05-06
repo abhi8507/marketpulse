@@ -150,9 +150,9 @@ Signals computed on rolling windows using NumPy and Pandas:
 | Phase | What we build                                              | Status      |
 |-------|------------------------------------------------------------|-------------|
 | 1     | Local setup, Docker, venv, folder structure                | ✅ Done     |
-| 2     | yfinance producer → Kafka → consumer → terminal output     | 🔄 Current  |
-| 3     | ETL pipeline + signal engine → PostgreSQL storage          | Pending     |
-| 4     | FastAPI REST + WebSocket layer                             | Pending     |
+| 2     | yfinance producer → Kafka → consumer → terminal output     | ✅ Done     |
+| 3     | ETL pipeline + signal engine → PostgreSQL storage          | ✅ Done     |
+| 4     | FastAPI REST + WebSocket layer                             | 🔄 Current  |
 | 5     | LLM summary layer (OpenAI)                                 | Pending     |
 | 6     | Angular dashboard with live charts                         | Pending     |
 | 7     | ELK + Prometheus observability                             | Pending     |
@@ -180,14 +180,18 @@ Signals computed on rolling windows using NumPy and Pandas:
 |-----------------------------------|-------------|
 | `docker-compose.yml`              | ✅ Done     |
 | `infra/prometheus.yml`            | ✅ Done     |
-| `.env`                            | ✅ Created  |
-| `requirements.txt`                | ✅ Created  |
-| `ingestion/__init__.py`           | ✅ Created  |
-| `processing/__init__.py`          | ✅ Created  |
+| `.env`                            | ✅ Done     |
+| `requirements.txt`                | ✅ Done     |
+| `ingestion/__init__.py`           | ✅ Done     |
+| `processing/__init__.py`          | ✅ Done     |
 | `ingestion/yahoo_producer.py`     | ✅ Done     |
 | `ingestion/kafka_consumer.py`     | ✅ Done     |
-| `processing/signal_engine.py`     | 🔄 Next     |
-| `processing/etl_pipeline.py`      | Pending     |
+| `processing/signal_engine.py`     | ✅ Done     |
+| `processing/etl_pipeline.py`      | ✅ Done     |
+| `api/__init__.py`                 | 🔄 Next     |
+| `api/main.py`                     | 🔄 Next     |
+| `api/routes/signals.py`           | 🔄 Next     |
+| `api/routes/alerts.py`            | 🔄 Next     |
+| `api/websocket_manager.py`        | 🔄 Next     |
 | `llm_agent/market_summariser.py`  | Pending     |
-| `api/main.py`                     | Pending     |
 | `frontend/`                       | Pending     |
